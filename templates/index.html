@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UrbanFlow | Smart Traffic Dashboard</title>
+    <link rel="icon" href="https://fav.farm/🚦" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #041421;
+            color: #f0f9ff;
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(7, 26, 43, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-gradient {
+            background: linear-gradient(180deg, rgba(14, 165, 233, 0.1) 0%, rgba(4, 20, 33, 0) 100%);
+        }
+        /* Prevents the layout from jumping when results appear */
+        .main-container-height {
+            min-height: 580px;
+        }
+        #imagePreview {
+            transition: opacity 0.4s ease-in-out;
+        }
+        .btn-interact:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="p-6 lg:p-12">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-10 flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white">Urban<span class="text-sky-400">Flow</span></h1>
+                <p class="text-slate-400 text-sm">Vision-Based Traffic Density Analysis for Smart Cities</p>
+            </div>
+            <div class="hidden md:block text-right">
+                <span class="text-xs font-mono text-sky-400 bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/20 uppercase tracking-widest">System Status: Active</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch main-container-height">
+            
+            <div class="lg:col-span-4 flex flex-col space-y-6">
+                <div class="glass sidebar-gradient p-8 rounded-3xl shadow-2xl flex-grow flex flex-col">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span class="text-sky-400">📤</span> Data Input
+                    </h2>
+                    
+                    <form method="POST" enctype="multipart/form-data" class="flex-grow flex flex-col">
+                        <div class="group relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-slate-600 rounded-2xl hover:border-sky-500 transition-all cursor-pointer bg-slate-800/30 overflow-hidden">
+                            <input type="file" name="image" id="fileInput" class="absolute inset-0 opacity-0 cursor-pointer z-50" accept="image/*" required>
+                            
+                            <div id="uploadPlaceholder" class="text-center transition-all duration-300 transform group-hover:scale-110">
+                                <svg class="w-12 h-12 mx-auto text-slate-500 group-hover:text-sky-400 mb-3 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                <p class="text-sm font-medium text-slate-300">Click to Upload Frame</p>
+                            </div>
+
+                            <div id="previewContainer" class="hidden absolute inset-0 w-full h-full bg-slate-900 flex flex-col items-center justify-center">
+                                <img id="imagePreview" src="#" alt="Preview" class="w-full h-full object-cover opacity-0">
+                                <div class="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-md p-2">
+                                    <p id="fileName" class="text-[10px] text-sky-300 font-mono text-center truncate px-4"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-interact w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-sky-500/20 mt-6">
+                            Run Analysis
+                        </button>
+                    </form>
+                </div>
+
+                <div class="glass p-6 rounded-3xl text-sm text-slate-400 flex items-start gap-3">
+                    <span class="text-lg">💡</span>
+                    <p><strong>Tip:</strong> High-resolution top-down angles provide the most accurate vehicle count for AI detection.</p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 flex flex-col">
+                <div class="glass rounded-3xl overflow-hidden shadow-2xl flex-grow flex flex-col md:flex-row">
+                    {% if count is not undefined %}
+                        <div class="bg-black/40 flex items-center justify-center md:w-1/2 border-b md:border-b-0 md:border-r border-white/10 p-4">
+                            <img src="{{ url_for('static', filename='uploads/' + image_name) }}" class="max-w-full max-h-[450px] object-contain rounded-xl shadow-2xl">
+                        </div>
+
+                        <div class="p-10 md:w-1/2 flex flex-col justify-between space-y-8 bg-slate-900/20">
+                            <div>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-sky-400 mb-8 border-b border-sky-400/20 pb-2">Analysis Results</h3>
+                                <div class="space-y-8">
+                                    <div class="flex justify-between items-end border-b border-slate-700/50 pb-3">
+                                        <span class="text-slate-400">Total Vehicles</span>
+                                        <span class="text-5xl font-extrabold text-white">{{ count }}</span>
+                                    </div>
+                                    <div class="flex justify-between items-end border-b border-slate-700/50 pb-3">
+                                        <span class="text-slate-400">Traffic Density</span>
+                                        <span class="text-2xl font-semibold text-sky-300">{{ density }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-emerald-500/10 border border-emerald-500/20 p-8 rounded-3xl text-center transform transition-all hover:scale-[1.02]">
+                                <p class="text-emerald-400 text-xs font-bold uppercase mb-2 tracking-widest">Optimized Green Time</p>
+                                <div class="text-6xl font-black text-emerald-400">
+                                    {{ signal_time }}<span class="text-2xl ml-2 font-light">sec</span>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="flex-grow flex flex-col items-center justify-center text-slate-600 space-y-6 min-h-[500px] w-full">
+                            <div class="relative">
+                                <div class="absolute inset-0 bg-sky-500/20 blur-3xl rounded-full"></div>
+                                <div class="relative p-8 bg-slate-800/40 rounded-full border border-slate-700">
+                                    <svg class="w-16 h-16 opacity-30 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-xl font-semibold text-slate-400">System Ready</p>
+                                <p class="text-slate-500 italic">Awaiting live feed analysis...</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewContainer = document.getElementById('previewContainer');
+        const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                fileNameDisplay.textContent = file.name;
+                const reader = new FileReader();
+                
+                // Add a small fade out to the placeholder first
+                uploadPlaceholder.style.opacity = '0';
+                
+                reader.onload = function(e) {
+                    setTimeout(() => {
+                        imagePreview.src = e.target.result;
+                        previewContainer.classList.remove('hidden');
+                        
+                        // Small timeout to trigger the opacity transition
+                        setTimeout(() => {
+                            imagePreview.classList.add('opacity-100');
+                        }, 50);
+                    }, 200);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
