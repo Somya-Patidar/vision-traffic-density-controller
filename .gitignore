@@ -4,3 +4,4 @@ __pycache__/
 static/uploads/*
 .DS_Store
 yolov8n.pt
+yolov8s.pt
