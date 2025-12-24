@@ -13,8 +13,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # 1. LOAD MODEL GLOBALLY (Saves RAM by not reloading)
-# We use the Nano model (yolov8n) as it is the smallest available.
-model = YOLO('yolov8n.pt')
+model = YOLO('yolov8s.pt')
 
 def get_signal_timing(vehicle_count):
     if vehicle_count < 10:
@@ -38,11 +37,8 @@ def index():
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filepath)
 
-            # 2. LOW-MEMORY INFERENCE
-            # imgsz=320: Reduces image resolution (standard is 640) to save 75% RAM
-            # half=False: Render CPUs don't support half-precision well, so we keep it False 
-            # unless using a GPU, but imgsz is the biggest RAM saver.
-            results = model(filepath, conf=0.15, imgsz=320)
+            # iou=0.5 (default is 0.7). Lowering it helps with overlapping vehicles.
+            results = model(filepath, conf=0.15, imgsz=640, iou=0.5)
             
             vehicle_classes = [2, 3, 5, 7] # car, motorcycle, bus, truck
             count = 0
