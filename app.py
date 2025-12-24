@@ -42,7 +42,7 @@ def index():
             # imgsz=320: Reduces image resolution (standard is 640) to save 75% RAM
             # half=False: Render CPUs don't support half-precision well, so we keep it False 
             # unless using a GPU, but imgsz is the biggest RAM saver.
-            results = model(filepath, conf=0.25, imgsz=320)
+            results = model(filepath, conf=0.15, imgsz=320)
             
             vehicle_classes = [2, 3, 5, 7] # car, motorcycle, bus, truck
             count = 0
